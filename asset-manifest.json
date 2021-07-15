@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/ReactCalculator/static/css/main.cbfc52b6.chunk.css",
-    "main.js": "/ReactCalculator/static/js/main.53ef2635.chunk.js",
-    "main.js.map": "/ReactCalculator/static/js/main.53ef2635.chunk.js.map",
+    "main.js": "/ReactCalculator/static/js/main.eaa14a6b.chunk.js",
+    "main.js.map": "/ReactCalculator/static/js/main.eaa14a6b.chunk.js.map",
     "runtime-main.js": "/ReactCalculator/static/js/runtime-main.3ad27e0f.js",
     "runtime-main.js.map": "/ReactCalculator/static/js/runtime-main.3ad27e0f.js.map",
-    "static/js/2.a029aa37.chunk.js": "/ReactCalculator/static/js/2.a029aa37.chunk.js",
-    "static/js/2.a029aa37.chunk.js.map": "/ReactCalculator/static/js/2.a029aa37.chunk.js.map",
+    "static/js/2.ace32481.chunk.js": "/ReactCalculator/static/js/2.ace32481.chunk.js",
+    "static/js/2.ace32481.chunk.js.map": "/ReactCalculator/static/js/2.ace32481.chunk.js.map",
     "index.html": "/ReactCalculator/index.html",
     "static/css/main.cbfc52b6.chunk.css.map": "/ReactCalculator/static/css/main.cbfc52b6.chunk.css.map",
-    "static/js/2.a029aa37.chunk.js.LICENSE.txt": "/ReactCalculator/static/js/2.a029aa37.chunk.js.LICENSE.txt"
+    "static/js/2.ace32481.chunk.js.LICENSE.txt": "/ReactCalculator/static/js/2.ace32481.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.3ad27e0f.js",
-    "static/js/2.a029aa37.chunk.js",
+    "static/js/2.ace32481.chunk.js",
     "static/css/main.cbfc52b6.chunk.css",
-    "static/js/main.53ef2635.chunk.js"
+    "static/js/main.eaa14a6b.chunk.js"
   ]
 }
