@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import './index.css';
 import {createStore} from "redux";
 import {Provider, connect} from "react-redux";
-import Math from "math-expression-evaluator";
+import MathJS from "math-expression-evaluator";
 
 const buttons = [
     ['number', '0', 'zero', 96],
@@ -80,14 +80,16 @@ const Reducer = (state = Object.assign({}, defaultValues), action) => {
                 dotted: false
             });
         case 'equals':
+            let ans = MathJS.eval(state.display);
+            if (ans < Math.pow(10, 20)) ans = Number.parseFloat(ans.toFixed(10));
             return Object.assign({}, state, {
-                current: '' + Math.eval(state.display),
-                display: state.display + '=' + Math.eval(state.display),
+                current: '' + ans,
+                display: state.display + '=' + ans,
                 calculated: true
             })
         default:
             return state;
-    };
+    }
 };
 
 const store = createStore(Reducer);
@@ -101,7 +103,6 @@ class Button extends React.Component {
     }
     handleClick() {
         store.dispatch(actionCreator(this.props.index));
-        console.log(store.getState())
     }
     componentDidMount() {
         document.addEventListener("keydown", this.handleKeyPress);
@@ -119,9 +120,6 @@ class Button extends React.Component {
 }
 
 class Display extends React.Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return(
             <div id={"screen"}>
@@ -135,15 +133,12 @@ class Display extends React.Component {
 //react-redux
 const mapStateToProps = (state) =>  {return {values: Object.assign({}, state)}};
 const mapDispatchToProps = (dispatch) => {
-    return {send: (index) =>{dispatch(actionCreator(index))}};
+    return {send: (index) => {dispatch(actionCreator(index))}};
 }
 
 const DisplayContainer = connect(mapStateToProps, mapDispatchToProps)(Display);
 
 class Calculator extends React.Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <div id={"calculator"}>
