@@ -1,9 +1,7 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import './index.css';
-import {createStore} from "redux";
-import {Provider, connect} from "react-redux";
-import MathJS from "math-expression-evaluator";
+import React, {useEffect, useContext, useReducer} from 'react'
+import './index.css'
+import MathJS from "math-expression-evaluator"
+import ReactDom from 'react-dom'
 
 const buttons = [
     ['number', '0', 'zero', 96],
@@ -26,127 +24,122 @@ const buttons = [
     ['equals', '=', 'equals', 13]
 ]
 
-//redux
-const MAX_LENGTH = 12;
+const MAX_LENGTH = 12
 
 const defaultValues = {
     calculated: false,
     current: '0',
     dotted: false,
     display: '0'
-};
+}
 
-const actionCreator = (index) => ({
-    type: buttons[index][0],
-    value: buttons[index][1]
-});
-
-const Reducer = (state = Object.assign({}, defaultValues), action) => {
+const Reducer = (state, action) => {
     switch (action.type) {
         case 'number':
-            if (state.calculated) state = Object.assign({}, defaultValues);
-            if (action.value == '0' && state.current=='0') return state;
-            if (state.current == '0') return Object.assign({}, state, {
+            if (state.calculated) state = {...defaultValues}
+            if (action.value === '0' && state.current ==='0') return state;
+            if (state.current === '0') return {...state, 
                 current: action.value,
-                display: state.display.slice(0, -1) + action.value,});
-            if (state.current.length < MAX_LENGTH) return Object.assign({}, state, {
+                display: state.display.slice(0, -1) + action.value}
+            if (state.current.length < MAX_LENGTH) return {...state,
                 current: state.current + action.value,
-                display: state.display + action.value});
+                display: state.display + action.value}
             else return state;
         case 'delete':
-            if (state.calculated) state = Object.assign({}, defaultValues);
-            return Object.assign({}, state, {
+            if (state.calculated) state = {...defaultValues}
+            return {...state,
                 current: state.current.slice(0, -1),
-                display: state.display.slice(0, -1)});
+                display: state.display.slice(0, -1)}
         case 'dot':
-            if (state.calculated) state = Object.assign({}, defaultValues);
-            if (!state.dotted) return Object.assign({}, state, {
+            if (state.calculated) state = {...defaultValues}
+            if (!state.dotted) return {...state,
                 current: state.current + action.value,
                 display: state.display + action.value,
-                dotted: true});
+                dotted: true}
             else return state;
         case 'clear':
-            return Object.assign({}, defaultValues);
+            return {...defaultValues}
         case 'operator':
             if (state.calculated) {
                 state.display = state.current;
                 state.calculated = false;
             }
             if (/\W{2}/.test(state.display.slice(-2))) state.display = state.display.slice(0,-2);
-            if (action.value != '-') if(/[+*/-]/.test(state.display.slice(-1))) state.display = state.display.slice(0,-1);
-            return Object.assign({}, state,{
+            if (action.value !== '-') if(/[+*/-]/.test(state.display.slice(-1))) state.display = state.display.slice(0,-1);
+            return {...state,
                 current: '',
                 display: state.display + action.value,
                 dotted: false
-            });
+            }
         case 'equals':
             let ans = MathJS.eval(state.display);
             if (ans < Math.pow(10, 20)) ans = Number.parseFloat(ans.toFixed(10));
-            return Object.assign({}, state, {
+            return {...state,
                 current: '' + ans,
                 display: state.display + '=' + ans,
                 calculated: true
-            })
+            }
         default:
             return state;
     }
-};
-
-const store = createStore(Reducer);
-
-//React
-class Button extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-        this.handleKeyPress = this.handleKeyPress.bind(this);
-    }
-    handleClick() {
-        store.dispatch(actionCreator(this.props.index));
-    }
-    componentDidMount() {
-        document.addEventListener("keydown", this.handleKeyPress);
-    }
-    handleKeyPress(event) {
-        if (event.keyCode == buttons[this.props.index][3]) this.handleClick();
-    }
-    render() {
-        return (
-            <button id={buttons[this.props.index][2]} onClick={this.handleClick}>
-                {buttons[this.props.index][1]}
-            </button>
-        );
-    }
 }
 
-class Display extends React.Component {
-    render() {
-        return(
-            <div id={"screen"}>
-                <div id={"formula"}>{this.props.values.display}</div>
-                <div id={"display"}>{this.props.values.current}</div>
-            </div>
-        )
+const StateContext = React.createContext()
+const DispatchContext = React.createContext()
+
+function Provider({children}) {
+    const [state, dispatch] = useReducer(Reducer, {...defaultValues})
+
+    return (
+        <StateContext.Provider value={state}>
+            <DispatchContext.Provider value={dispatch}>
+                {children}
+            </DispatchContext.Provider>
+        </StateContext.Provider>
+    )
+}
+
+function Button(props) {
+    const dispatch = useContext(DispatchContext)
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress)
+        return () => {document.removeEventListener('keydown', handleKeyPress)}
+    })
+
+    function handleKeyPress(event) {
+        if (event.keyCode === buttons[props.index][3]) handleClick();
     }
+
+    function handleClick() {
+        dispatch({
+            type: buttons[props.index][0],
+            value: buttons[props.index][1]
+        })
+    }
+    return (
+        <button id={buttons[props.index][2]} onClick={handleClick}>{buttons[props.index][1]}</button>
+    )
 }
 
-//react-redux
-const mapStateToProps = (state) =>  {return {values: Object.assign({}, state)}};
-const mapDispatchToProps = (dispatch) => {
-    return {send: (index) => {dispatch(actionCreator(index))}};
+function Display() {
+    const state = useContext(StateContext)
+
+    return (
+        <div id={"screen"}>
+            <div id={"formula"}>{state.display}</div>
+            <div id={"display"}>{state.current}</div>
+        </div>
+    )
 }
 
-const DisplayContainer = connect(mapStateToProps, mapDispatchToProps)(Display);
-
-class Calculator extends React.Component {
-    render() {
-        return (
-            <div id={"calculator"}>
-                CATAN'S CALCULATOR
-                <Provider store={store}>
-                    <DisplayContainer/>
-                </Provider>
-                <div id={'buttons'}>
+function Calculator() {
+    return(
+        <div id={"calculator"}>
+            CATAN'S CALCULATOR WITHOUT REDUX
+            <Provider>
+                <Display/>
+                <div id="buttons">
                     <div>
                         <Button index={15}/>
                         <Button index={16}/>
@@ -176,12 +169,12 @@ class Calculator extends React.Component {
                         <Button index={14}/>
                     </div>
                 </div>
-            </div>
-        )
-    }
+            </Provider>
+        </div>
+    )
 }
 
-ReactDOM.render(
+ReactDom.render(
     <Calculator/>,
     document.getElementById('root')
 )

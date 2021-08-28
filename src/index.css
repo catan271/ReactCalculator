@@ -20,6 +20,7 @@
     border: 0;
     font-family: 'Share Tech Mono', monospace, Arial;
     color: azure;
+    outline: 0;
 }
 
 #root {
