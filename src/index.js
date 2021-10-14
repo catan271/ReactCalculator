@@ -37,7 +37,7 @@ const Reducer = (state, action) => {
     switch (action.type) {
         case 'number':
             if (state.calculated) state = {...defaultValues}
-            if (action.value === '0' && state.current ==='0') return state;
+            if (action.value === '0' && state.current === '0') return state;
             if (state.current === '0') return {...state, 
                 current: action.value,
                 display: state.display.slice(0, -1) + action.value}
